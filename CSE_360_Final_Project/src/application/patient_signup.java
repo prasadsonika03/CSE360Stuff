@@ -138,6 +138,7 @@ public class patient_signup extends Application {
             writer.write("Date of Birth: " + dob + "\n");
             writer.write("Phone Number: " + phoneNumber + "\n");
             writer.write("Guardian Name: " + guardianName + "\n");
+            writer.write("Visits: \n");
             writer.close();
             System.out.println("Data written to file '" + fileName + "' successfully.");
             return true;
@@ -168,4 +169,3 @@ public class patient_signup extends Application {
         launch(args);
     }
 }
-
