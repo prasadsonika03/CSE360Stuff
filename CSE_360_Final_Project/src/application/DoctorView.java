@@ -35,14 +35,15 @@ public class DoctorView extends Application {
         Text message = new Text("Welcome to the Doctor's View!");
         root.getChildren().add(message);
         VBox mainBox = new VBox();
+        VBox patientInfoBox = new VBox(); // You can use any layout container
         TabPane patientsTabPane = new TabPane();
         TextField dateField = new TextField();
         Label bpField = new Label();
-        TextField allergyField = new TextField();
+        TextField observationField = new TextField();
         Label heightField = new Label();
         Label weightField = new Label();
         Label bodyTempField = new Label();
-        TextField concernsField = new TextField();
+        TextField medicationField = new TextField();
         List<String> fileNames = new ArrayList<>();
         File[] files = new File(".").listFiles();
         for (File file : files) {
@@ -94,7 +95,6 @@ public class DoctorView extends Application {
 
                 // Create a new tab for the patient
                 Tab patientTab = new Tab(firstName + " " + lastName);
-                VBox patientInfoBox = new VBox(); // You can use any layout container
 
                 // Add patient-specific content to the tab
                 patientInfoBox.getChildren().addAll(
@@ -132,34 +132,20 @@ public class DoctorView extends Application {
         HBox dateBox = new HBox(dateLabel, dateField);
         dateBox.setSpacing(10);
 
+        // Create VBox for Known observation
+        VBox observationVBox = new VBox();
+        Label observationLabel = new Label("Observations:");
+        observationField.setPrefHeight(100); // Increase the height of the text field
+        observationVBox.getChildren().addAll(observationLabel, observationField);
 
-        HBox weightHeightBox = new HBox(new Label("Weight:"), weightField, new Label("Height:"), heightField);
-        weightHeightBox.setSpacing(10);
-        weightHeightBox.setAlignment(Pos.CENTER_LEFT);
-        weightHeightBox.setSpacing(10);
-        
-
-
-
-
-        HBox bodyTempBpBox = new HBox(new Label("Body Temperature:"), bodyTempField, new Label("Blood Pressure:"), bpField);
-        bodyTempBpBox.setSpacing(10);
-        bodyTempBpBox.setAlignment(Pos.CENTER_LEFT);
-
-        // Create VBox for Known Allergies
-        VBox allergyVBox = new VBox();
-        Label allergyLabel = new Label("Observations:");
-        allergyField.setPrefHeight(100); // Increase the height of the text field
-        allergyVBox.getChildren().addAll(allergyLabel, allergyField);
-
-        // Create VBox for Health Concerns
-        VBox concernsVBox = new VBox();
-        Label concernsLabel = new Label("Prescribed Medication");
-        concernsField.setPrefHeight(100); // Increase the height of the text field
-        concernsVBox.getChildren().addAll(concernsLabel, concernsField);
+        // Create VBox for Health medication
+        VBox medicationVBox = new VBox();
+        Label medicationLabel = new Label("Prescribed Medication");
+        medicationField.setPrefHeight(100); // Increase the height of the text field
+        medicationVBox.getChildren().addAll(medicationLabel, medicationField);
 
         // Add boxes to the VBox
-        textFieldsBox.getChildren().addAll(dateBox, weightHeightBox, bodyTempBpBox, allergyVBox, concernsVBox);
+        textFieldsBox.getChildren().addAll(dateBox, observationVBox, medicationVBox);
 
         // Create the DoctorView heading
         Text heading = new Text("Doctor View");
@@ -186,21 +172,17 @@ public class DoctorView extends Application {
 
         dateField.setPrefSize(150, 50);
         bpField.setPrefSize(150, 50);
-        allergyField.setPrefSize(150, 50);
+        observationField.setPrefSize(150, 50);
         heightField.setPrefSize(150, 50);
         weightField.setPrefSize(150, 50);
         bodyTempField.setPrefSize(150, 50);
-        concernsField.setPrefSize(150, 50);
+        medicationField.setPrefSize(150, 50);
 
         submitButton.setOnAction(e -> {
-            String height = heightField.getText();
-            String weight = weightField.getText();
-            String bodyTemp = bodyTempField.getText();
+            String observation = observationField.getText();
             String date = dateField.getText();
-            String bp = bpField.getText();
-            String allergy = allergyField.getText();
-            String concerns = concernsField.getText();
-            if (fieldsAreFilled( dateField,  allergyField, concernsField)) {
+            String medication = medicationField.getText();
+            if (fieldsAreFilled( dateField,  observationField, medicationField)) {
                 Tab selectedTab = patientsTabPane.getSelectionModel().getSelectedItem();
                 VBox contentBox = (VBox) selectedTab.getContent();
                 String tabContent = "";
@@ -214,7 +196,7 @@ public class DoctorView extends Application {
                 String lastName = extractValue(tabContent, "Last Name:");
                 String dob = extractValue(tabContent, "Date of Birth:");
                 String fileName = firstName + "_" + lastName + "_" + dob + ".txt";
-                if (writeDataToFile(fileName, date, weight, height, bodyTemp, bp, allergy, concerns)) {
+                if (writeDataToFile(fileName, date, observation, medication)) {
                     showSuccessMessage("Patient data updated!");
                 } else {
                     showError("Failed to update patient info. Please try again.");
@@ -301,17 +283,13 @@ public class DoctorView extends Application {
     }
 
 
-    private boolean writeDataToFile(String fileName, String date, String weight, String height, String bodyTemp, String bp, String allergies, String concerns) {
+    private boolean writeDataToFile(String fileName, String date, String observation, String medication) {
         try {
             FileWriter writer = new FileWriter(fileName, true);
             writer.write(".\n");
             writer.write("Date = " + date + "\n");
-            writer.write("Height = " + height + "\n");
-            writer.write("Weight = " + weight + "\n");
-            writer.write("Body Temp = " + bodyTemp + "\n");
-            writer.write("BP = " + bp + "\n");
-            writer.write("allergies = " + allergies + "\n");
-            writer.write("concerns = " + concerns + "\n");
+            writer.write("observation = " + observation + "\n");
+            writer.write("medication = " + medication + "\n");
             writer.close();
             System.out.println("Data appended to file '" + fileName + "' successfully.");
             return true;
