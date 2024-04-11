@@ -37,11 +37,11 @@ public class DoctorView extends Application {
         VBox mainBox = new VBox();
         TabPane patientsTabPane = new TabPane();
         TextField dateField = new TextField();
-        TextField bpField = new TextField();
+        Label bpField = new Label();
         TextField allergyField = new TextField();
-        TextField heightField = new TextField();
-        TextField weightField = new TextField();
-        TextField bodyTempField = new TextField();
+        Label heightField = new Label();
+        Label weightField = new Label();
+        Label bodyTempField = new Label();
         TextField concernsField = new TextField();
         List<String> fileNames = new ArrayList<>();
         File[] files = new File(".").listFiles();
@@ -132,25 +132,29 @@ public class DoctorView extends Application {
         HBox dateBox = new HBox(dateLabel, dateField);
         dateBox.setSpacing(10);
 
-        Label weightLabel = new Label("Weight:");
-        Label heightLabel = new Label("Height:");
-        HBox weightHeightBox = new HBox(weightLabel, weightField, heightLabel, heightField);
-        weightHeightBox.setSpacing(10);
 
-        Label bodyTempLabel = new Label("Body Temperature:");
-        Label bpLabel = new Label("Blood Pressure:");
-        HBox bodyTempBpBox = new HBox(bodyTempLabel, bodyTempField, bpLabel, bpField);
+        HBox weightHeightBox = new HBox(new Label("Weight:"), weightField, new Label("Height:"), heightField);
+        weightHeightBox.setSpacing(10);
+        weightHeightBox.setAlignment(Pos.CENTER_LEFT);
+        weightHeightBox.setSpacing(10);
+        
+
+
+
+
+        HBox bodyTempBpBox = new HBox(new Label("Body Temperature:"), bodyTempField, new Label("Blood Pressure:"), bpField);
         bodyTempBpBox.setSpacing(10);
+        bodyTempBpBox.setAlignment(Pos.CENTER_LEFT);
 
         // Create VBox for Known Allergies
         VBox allergyVBox = new VBox();
-        Label allergyLabel = new Label("Known Allergies:");
+        Label allergyLabel = new Label("Observations:");
         allergyField.setPrefHeight(100); // Increase the height of the text field
         allergyVBox.getChildren().addAll(allergyLabel, allergyField);
 
         // Create VBox for Health Concerns
         VBox concernsVBox = new VBox();
-        Label concernsLabel = new Label("Health Concerns:");
+        Label concernsLabel = new Label("Prescribed Medication");
         concernsField.setPrefHeight(100); // Increase the height of the text field
         concernsVBox.getChildren().addAll(concernsLabel, concernsField);
 
@@ -172,9 +176,13 @@ public class DoctorView extends Application {
 
         Button submitButton = createButton("Submit");
         Button logoutButton = createButton("Logout");
+        Button callButton = createButton("Call");
+        
+        
 
         submitButton.setPrefSize(150, 50);
         logoutButton.setPrefSize(150, 50);
+        callButton.setPrefSize(150, 50);
 
         dateField.setPrefSize(150, 50);
         bpField.setPrefSize(150, 50);
@@ -192,7 +200,7 @@ public class DoctorView extends Application {
             String bp = bpField.getText();
             String allergy = allergyField.getText();
             String concerns = concernsField.getText();
-            if (fieldsAreFilled(heightField, weightField, bodyTempField, dateField, bpField, allergyField, concernsField)) {
+            if (fieldsAreFilled( dateField,  allergyField, concernsField)) {
                 Tab selectedTab = patientsTabPane.getSelectionModel().getSelectedItem();
                 VBox contentBox = (VBox) selectedTab.getContent();
                 String tabContent = "";
@@ -217,6 +225,14 @@ public class DoctorView extends Application {
             primaryStage.close();
             new DoctorView().start(new Stage());
         });
+        
+        callButton.setOnAction(e -> {
+            Tab selectedTab = patientsTabPane.getSelectionModel().getSelectedItem();
+            if (selectedTab != null) {
+                String patientName = selectedTab.getText();
+                showInfoMessage(patientName + " has been notified");
+            }
+        });
 
         logoutButton.setOnAction(e -> {
             primaryStage.close();
@@ -224,13 +240,13 @@ public class DoctorView extends Application {
         });
 
         HBox buttonsBox = new HBox(20);
-        buttonsBox.getChildren().addAll(submitButton, logoutButton);
+        buttonsBox.getChildren().addAll(callButton, submitButton, logoutButton);
         buttonsBox.setAlignment(Pos.CENTER);
         mainBox.getChildren().add(buttonsBox);
 
         Scene scene = new Scene(splitPane, 800, 800);
         primaryStage.setScene(scene);
-        primaryStage.setTitle("Nurse's View");
+        primaryStage.setTitle("Doctor's View");
         primaryStage.show();
     }
 
@@ -275,6 +291,15 @@ public class DoctorView extends Application {
         alert.setContentText(message);
         alert.showAndWait();
     }
+    
+    private void showInfoMessage(String message) {
+        Alert alert = new Alert(AlertType.INFORMATION);
+        alert.setTitle("Call Patient");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
 
     private boolean writeDataToFile(String fileName, String date, String weight, String height, String bodyTemp, String bp, String allergies, String concerns) {
         try {
